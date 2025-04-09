@@ -503,9 +503,6 @@ class Cursor(common.DBAPICursor):
         _check_status(response)
         schema = self.description
         assert not response.results.rows, 'expected data in columnar format'
-        columns = [_unwrap_column(col, col_schema[1]) for col, col_schema in
-                   zip(response.results.columns, schema)]
-        new_data = list(zip(*columns))
 
          # NOTE: response.results.columns and schema might be None in queries that return no
         # results, and should be checked (https://github.com/dbt-labs/dbt-external-tables/issues/234)
