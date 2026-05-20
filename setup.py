@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
+import re
+import sys
+
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
-import pyhive
-import sys
 
 
 class PyTest(TestCommand):
@@ -19,12 +20,24 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
+def _read_version():
+    # Read __version__ from pyhive/__init__.py without importing the package.
+    # PEP-517 isolated builds (modern pip) cannot import the package being
+    # installed during setup.py execution.
+    with open('pyhive/__init__.py') as fp:
+        match = re.search(
+            r"^__version__\s*=\s*['\"]([^'\"]+)['\"]", fp.read(), re.M)
+    if not match:
+        raise RuntimeError("Unable to find __version__ in pyhive/__init__.py")
+    return match.group(1)
+
+
 with open('README.rst') as readme:
     long_description = readme.read()
 
 setup(
     name="PyHive",
-    version=pyhive.__version__,
+    version=_read_version(),
     description="Python interface to Hive",
     long_description=long_description,
     url='https://github.com/dropbox/PyHive',
